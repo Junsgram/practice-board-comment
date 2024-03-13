@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/layout/basic::setContent(~{this::content})}">
+    <th:block th:fragment="content">
+        <h2>게시글 상세보기 페이지</h2>
+        <form action="/board/modify" method="post">
+            <input type="hidden" name="page" th:value="${requestDTO.page}">
+            <div class="form-group">
+                <label>bno</label>
+                <input type="text" class="form-control" name="bno" th:value="${dto.bno}"
+                       readonly />  //수정불가
+            </div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" class="form-control" name="title" th:value="${dto.title}" />
+            </div>
+            <div class="form-group">
+                <label>Content</label>
+                <textarea class="form-control" name="content" rows="5" >[[${dto.content}]]</textarea>
+            </div>
+            <div class="form-group">
+                <label>Writer</label>
+                <input type="text" class="form-control" name="writer" th:value="${dto.writerName}"
+                       readonly/> //수정불가
+            </div>
+            <div class="form-group">
+                <label>RegDate</label>
+                <input type="text" class="form-control" th:value="${#temporals
+             .format(dto.regDate,'yyyy/MM/dd')}" readonly/>//수정불가
+            </div>
+            <div class="form-group">
+                <label>ModDate</label>
+                <input type="text" class="form-control"
+                       th:value="${#temporals.format(dto.modDate,'yyyy/MM/dd')}" readonly/>//수정불가
+            </div>
+        </form>
+        <button type="button" class="btn btn-primary modifyBtn">수정</button>
+        <button type="button" class="btn btn-primary listBtn">목록</button>
+        <button type="button" class="btn btn-primary removeBtn">삭제</button>
+
+
+
+    </th:block>
+</th:block>
+<script th:inline="javascript">
+    let actionForm = $("form"); //태그객체
+    $(".removeBtn").click(function(){
+        actionForm.attr("action","/board/remove")
+        .attr("method","post")
+        actionForm.submit();
+    })
+      $(".modifyBtn").click(function(){
+        if(!confirm("수정하시겠습니까?")){
+            return;
+        }
+         actionForm.attr("action","/board/modify")
+        .attr("method","post")
+        actionForm.submit();
+    })
+     $(".listBtn").click(function(){
+        let pageInfo = $("input[name='page']");
+        actionForm.empty();
+        actionForm.append(pageInfo);
+         actionForm.attr("action","/board/list")
+        .attr("method","get")
+        actionForm.submit();
+
+    })
+
+</script>
+</html>

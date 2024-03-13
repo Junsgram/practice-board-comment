@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{/layout/basic::setContent(~{this::content})}">
+    <th:block th:fragment="content">
+        <h2>게시글 목록 페이지
+            <span>
+                <a th:href="@{/board/register}">
+                    <button type="button" class="btn btn-outline-primary">register</button></a>
+            </span>
+        </h2>
+        <form action="/board/list" method="get" id="searchForm">
+            <div class="input-group">
+                <input type="hidden" name="page" value="1" />
+                <div class="input-group-prepend">
+                    <select name="type" class="custom-select">
+                        <option th:selected="${pageRequestDTO.type==null}">-----------------</option>
+                        <option th:selected="${pageRequestDTO.type=='t'}" value="t">제목</option>
+                        <option th:selected="${pageRequestDTO.type=='c'}" value="c">내용</option>
+                        <option th:selected="${pageRequestDTO.type=='w'}" value="w">작성자</option>
+                        <option th:selected="${pageRequestDTO.type=='tc'}" value="tc">제목,내용</option>
+                        <option th:selected="${pageRequestDTO.type=='tcw'}" value="tcw">제목,내용,작성자</option>
+                    </select>
+                </div>
+                <input type="text" class="form-control" name="keyword" th:value="${pageRequestDTO.keyword}">
+                <div class="input-group-append" id="button-addon4">
+                    <button class="btn btn-outline-secondary btn-search" type="button">Search</button>
+                    <button class="btn btn-outline-secondary btn-clear" type="button">Clear</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>제목</th>
+                <th>글쓴이</th>
+                <th>등록일</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="dto:${result.dtoList}">
+                <td>[[${dto.bno}]]</td>
+                <td><a th:href="@{/board/read(bno=${dto.bno},page=${result.page})}">[[${dto.title}]]-----[[${dto.replyCount}]]</a></td>
+                <td>이름 : [[${dto.writerName}]], 이메일 : [[${dto.writerEmail}]]</td>
+                <td>[[${#temporals.format(dto.regDate,'yyyy/MM/dd')}]]</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Modal body text goes here.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"  data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ul class="pagination h-100 justify-content align-items-center">
+            <li class="page-item " th:if="${result.prev}">
+                <a class="page-link" th:href="@{/board/list(page=${result.start-1},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" tabindex="-1">Previous</a>
+            </li>
+            <li th:each="page:${result.pageList}" th:class="'page-item '+${result.page==page? 'active':''}">
+                <a class="page-link" th:href="@{/board/list(page=${page},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}">[[${page}]]</a>
+            </li>
+            <li class="page-item" th:if="${result.next}">
+                <a class="page-link" th:href="@{/board/list(page=${result.end+1},type=${pageRequestDTO.type},keyword=${pageRequestDTO.keyword})}" >Next</a>
+            </li>
+        </ul>
+    </th:block>
+</th:block>
+<script th:inline="javascript">
+    let msg = [[${msg}]];
+    console.log(msg);
+    if(msg) {
+        $(".modal").modal();
+    }
+    let searchForm = $("#searchForm");
+    $(".btn-search").click(function(e){
+        searchForm.submit();
+    })
+    $(".btn-clear").click(function(e){
+        searchForm.empty().submit();
+    })
+</script>
+</html>
